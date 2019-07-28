@@ -11,6 +11,7 @@ type Queue struct {
 	MaxCapacity int
 	Q           chan message
 	Clients     map[string]Client
+	w           chan bool
 }
 
 type message struct {
@@ -25,14 +26,16 @@ func Create(Name string, MaxCapacity int) *Queue {
 		MaxCapacity: MaxCapacity,
 		Q:           make(chan message, MaxCapacity),
 		Clients:     make(map[string]Client),
+		w:           make(chan bool),
 	}
+	go q.listen()
 	return q
 }
 
 func (q *Queue) Connect(client Client) {
 	q.Clients[client.Id] = client
 	if len(q.Clients) > 0 {
-		go q.listen()
+		q.w <- true
 	}
 }
 
@@ -54,6 +57,9 @@ func (q *Queue) Broadcast(input interface{}) {
 
 func (q *Queue) listen() {
 	for m := range q.Q {
+		if len(q.Clients) < 1 {
+			<-q.w
+		}
 		if m.isBroadcast { // send the message to all receivers
 			for _, client := range q.Clients {
 				go client.publishToClient(m.body)
