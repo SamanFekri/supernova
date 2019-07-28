@@ -19,11 +19,6 @@ type message struct {
 	body        interface{}
 }
 
-type Client struct {
-	Id           string
-	ReceiveQueue chan interface{}
-}
-
 func Create(Name string, MaxCapacity int) *Queue {
 	q := &Queue{
 		Name:        Name,
@@ -59,11 +54,11 @@ func (q *Queue) listen() {
 	for m := range q.Queue {
 		if m.isBroadcast { // send the message to all receivers
 			for _, client := range q.Clients {
-				go publishToClient(m.body, client.ReceiveQueue)
+				go client.publishToClient(m.body)
 			}
 		} else if m.receiver != "" { // send the message to specific receiver
 			if client, exist := q.Clients[m.receiver]; exist {
-				go publishToClient(m.body, client.ReceiveQueue)
+				go client.publishToClient(m.body)
 			}
 		} else { // send the message to a random receiver
 			n := len(q.Clients)
@@ -76,11 +71,7 @@ func (q *Queue) listen() {
 				}
 				i--
 			}
-			go publishToClient(m.body, client.ReceiveQueue)
+			go client.publishToClient(m.body)
 		}
 	}
-}
-
-func publishToClient(input interface{}, q chan interface{}) {
-	q <- input
 }
