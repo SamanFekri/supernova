@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/Samanfekri/supernova"
+	"github.com/Samanfekri/supernova/queue"
 	"time"
 )
 
 func main() {
-	q := supernova.Create("Salam", 1000)
-	c1 := supernova.Client{Id: "akbar", ReceiveQueue: make(chan interface{}, 100)}
-	c2 := supernova.Client{Id: "asghar", ReceiveQueue: make(chan interface{}, 100)}
+	q := queue.Create("Salam", 1000)
+	c1 := queue.Client{Id: "akbar", ReceiveQueue: make(chan interface{}, 100)}
+	c2 := queue.Client{Id: "asghar", ReceiveQueue: make(chan interface{}, 100)}
 	q.Connect(c1)
 	q.Connect(c2)
 	go func() {

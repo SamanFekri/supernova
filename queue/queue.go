@@ -1,4 +1,4 @@
-package supernova
+package queue
 
 import (
 	"errors"
