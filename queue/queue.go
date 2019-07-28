@@ -26,12 +26,14 @@ func Create(Name string, MaxCapacity int) *Queue {
 		Q:           make(chan message, MaxCapacity),
 		Clients:     make(map[string]Client),
 	}
-	go q.listen()
 	return q
 }
 
 func (q *Queue) Connect(client Client) {
 	q.Clients[client.Id] = client
+	if len(q.Clients) > 0 {
+		go q.listen()
+	}
 }
 
 func (q *Queue) Publish(input interface{}) {
