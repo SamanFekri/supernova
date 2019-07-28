@@ -36,6 +36,10 @@ func Create(Name string, MaxCapacity int) *Queue {
 	return q
 }
 
+func (q *Queue) Connect(client Client) {
+	q.Clients[client.Id] = client
+}
+
 func (q *Queue) Publish(input interface{}) {
 	q.Queue <- message{isBroadcast: false, receiver: "", body: input}
 }
