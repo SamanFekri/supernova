@@ -29,5 +29,8 @@ func (u *ConnectedUser) Broadcast(msg interface{}) {
 }
 
 func (u *ConnectedUser) Receive() chan interface{} {
+	if _, exist := u.Channel.Queue.Clients[u.User.Id]; !exist {
+		u.Channel.Queue.Connect(u.User)
+	}
 	return u.User.ReceiveQueue
 }
