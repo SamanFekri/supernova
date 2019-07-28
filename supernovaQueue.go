@@ -1,8 +1,7 @@
-package main
+package supernova
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -83,6 +82,5 @@ func (q *Queue) listen() {
 }
 
 func publishToClient(input interface{}, q chan interface{}) {
-	fmt.Println(input)
 	q <- input
 }
