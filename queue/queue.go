@@ -9,7 +9,7 @@ import (
 type Queue struct {
 	Name        string
 	MaxCapacity int
-	Queue       chan message
+	Q           chan message
 	Clients     map[string]Client
 }
 
@@ -23,7 +23,7 @@ func Create(Name string, MaxCapacity int) *Queue {
 	q := &Queue{
 		Name:        Name,
 		MaxCapacity: MaxCapacity,
-		Queue:       make(chan message, MaxCapacity),
+		Q:           make(chan message, MaxCapacity),
 		Clients:     make(map[string]Client),
 	}
 	go q.listen()
@@ -35,23 +35,23 @@ func (q *Queue) Connect(client Client) {
 }
 
 func (q *Queue) Publish(input interface{}) {
-	q.Queue <- message{isBroadcast: false, receiver: "", body: input}
+	q.Q <- message{isBroadcast: false, receiver: "", body: input}
 }
 
 func (q *Queue) PublishTo(input interface{}, receiver string) error {
 	if _, exist := q.Clients[receiver]; !exist {
 		return errors.New("This receiver does`nt exist in this queue.")
 	}
-	q.Queue <- message{isBroadcast: false, receiver: receiver, body: input}
+	q.Q <- message{isBroadcast: false, receiver: receiver, body: input}
 	return nil
 }
 
 func (q *Queue) Broadcast(input interface{}) {
-	q.Queue <- message{isBroadcast: true, receiver: "", body: input}
+	q.Q <- message{isBroadcast: true, receiver: "", body: input}
 }
 
 func (q *Queue) listen() {
-	for m := range q.Queue {
+	for m := range q.Q {
 		if m.isBroadcast { // send the message to all receivers
 			for _, client := range q.Clients {
 				go client.publishToClient(m.body)
