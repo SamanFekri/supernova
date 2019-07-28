@@ -34,3 +34,7 @@ func (u *ConnectedUser) Receive() chan interface{} {
 	}
 	return u.User.ReceiveQueue
 }
+
+func (u *ConnectedUser) Disconnect() {
+	u.Channel.Disconnect(u.User.Id)
+}

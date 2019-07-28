@@ -39,6 +39,10 @@ func (q *Queue) Connect(client Client) {
 	}
 }
 
+func (q *Queue) Disconnect(id string) {
+	delete(q.Clients, id)
+}
+
 func (q *Queue) Publish(input interface{}) {
 	q.Q <- message{isBroadcast: false, receiver: "", body: input}
 }
