@@ -1,6 +1,11 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"math/rand"
+	"time"
+)
 
 type Queue struct {
 	Name        string
@@ -43,4 +48,35 @@ func (q *Queue) PublishTo(input interface{}, receiver string) error {
 
 func (q *Queue) Broadcast(input interface{}) {
 	q.Queue <- message{isBroadcast: true, receiver: "", body: input}
+}
+
+func (q *Queue) listen() {
+	for m := range q.Queue {
+		if m.isBroadcast { // send the message to all receivers
+			for _, client := range q.Clients {
+				go publishToClient(m.body, client.ReceiveQueue)
+			}
+		} else if m.receiver != "" { // send the message to specific receiver
+			if client, exist := q.Clients[m.receiver]; exist {
+				go publishToClient(m.body, client.ReceiveQueue)
+			}
+		} else { // send the message to a random receiver
+			n := len(q.Clients)
+			rand.Seed(time.Now().UnixNano())
+			i := rand.Intn(n)
+			var client Client
+			for _, client = range q.Clients {
+				if i == 0 {
+					break
+				}
+				i--
+			}
+			go publishToClient(m.body, client.ReceiveQueue)
+		}
+	}
+}
+
+func publishToClient(input interface{}, q chan interface{}) {
+	fmt.Println(input)
+	q <- input
 }
