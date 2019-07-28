@@ -26,12 +26,14 @@ type Client struct {
 }
 
 func Create(Name string, MaxCapacity int) *Queue {
-	return &Queue{
+	q := &Queue{
 		Name:        Name,
 		MaxCapacity: MaxCapacity,
 		Queue:       make(chan message, MaxCapacity),
 		Clients:     make(map[string]Client),
 	}
+	go q.listen()
+	return q
 }
 
 func (q *Queue) Publish(input interface{}) {
