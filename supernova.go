@@ -11,7 +11,7 @@ func Dial() *Supernova {
 	return &s
 }
 
-func (s *Supernova) Channel(name string, size int) *Channel {
+func (s *Supernova) DeclareChannel(name string, size int) *Channel {
 	if c, exist := (*s)[name]; exist {
 		return c
 	}

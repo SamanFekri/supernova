@@ -9,7 +9,7 @@ import (
 
 func main() {
 	s := supernova.Dial()
-	ch := s.Channel("channel1", 1000)
+	ch := s.DeclareChannel("channel1", 1000)
 
 	c1 := queue.Client{Id: "abc", ReceiveQueue: make(chan interface{}, 100)}
 	c2 := queue.Client{Id: "cba", ReceiveQueue: make(chan interface{}, 100)}
@@ -18,7 +18,7 @@ func main() {
 	u2 := ch.Connect(c2)
 
 	for i := 0; i < 100; i++ {
-		u1.Publish(fmt.Sprintf("C1 send to channel %d", i))
+		u1.Publish(fmt.Sprintf("C1 send to channel1 %d", i))
 
 	}
 
