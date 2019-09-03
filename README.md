@@ -1,5 +1,5 @@
 <p align="center">
-<img width="200px" height="200px" src="./supernova.svg">
+<img width="96px" height="200px" src="./supernova.svg">
 </p>
 
 # supernova
